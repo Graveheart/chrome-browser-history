@@ -5,9 +5,8 @@
   "permissions": [
     "history"
   ],
-  "browser_action": {
-    "default_popup": "typedUrls.html",
-    "default_icon": "clock.png"
+  "chrome_url_overrides" : {
+    "history": "typedUrls.html"
   },
   "manifest_version": 2
 }
