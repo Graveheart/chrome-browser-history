@@ -6,7 +6,7 @@
     "history"
   ],
   "chrome_url_overrides" : {
-    "history": "typedUrls.html"
+    "history": "history.html"
   },
   "manifest_version": 2
 }
