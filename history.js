@@ -1,26 +1,58 @@
 const dummyDataset = {
   '1': {
+    id: '1',
     url: 'facebook.com',
     since: moment().subtract(1, 'hour'),
     until: moment().subtract(35, 'minutes'),
   },
   '2': {
+    id: '2',
     url: 'youtube.com',
     since: moment().subtract(20, 'minutes'),
-    until: moment().subtract(15, 'minutes'),
+    until: moment().subtract(5, 'minutes'),
   },
   '3': {
+    id: '3',
     url: 'reddit.com',
     since: moment().subtract(10, 'minutes'),
     until: moment(),
     parent: '2',
   },
   '4': {
+    id: '4',
     url: 'twitter.com',
     since: moment().subtract(8, 'minutes'),
     until: moment().subtract(2, 'minutes'),
     parent: '3',
-  }
+  },
+  '5': {
+    id: '5',
+    url: 'cnn.com',
+    since: moment().subtract(45, 'minutes'),
+    until: moment().subtract(40, 'minutes'),
+    parent: '1',
+  },
+  '6': {
+    id: '6',
+    url: 'ikea.dk',
+    since: moment().subtract(58, 'minutes'),
+    until: moment().subtract(55, 'minutes'),
+    parent: '1',
+  },
+  '7': {
+    id: '7',
+    url: 'imgur.com',
+    since: moment().subtract(6, 'minutes'),
+    until: moment().subtract(2, 'minutes'),
+    parent: '4',
+  },
+  '8': {
+    id: '8',
+    url: 'ku.dk',
+    since: moment().add(5, 'minutes'),
+    until: moment().add(15, 'minutes'),
+  }  
+  
 };
 
 const renderDataset = dataset => {
@@ -50,24 +82,51 @@ const renderDataset = dataset => {
     .domain([0, 3])
     .range([50, 400])
 
+
   const g = history
     .selectAll('.visit')
     .data(Object.values(dataset))
     .enter()
     .append('g')
     .attr('class', 'visit')
+    .attr('parent',visit => visit.parent)
     .attr('transform', visit => `translate(${xScale(visit.since.valueOf())}, ${yScale(level(visit))})`);
 
   g
-    .append('rect')
-    .attr('width', visit => widthScale(visit.until.diff(visit.since)))
-    .attr('height', 40)
-    .style('fill', 'red');
+    .append('line')
+    .attr('x1',0)
+    .attr('y1',10)
+    .attr('x2', visit => widthScale(visit.until.diff(visit.since)))
+    .attr('y2',10)
+    .attr('class','sitebar')
+    .attr('onmouseover',visit => `switchLine(${visit.id},true)`)
+    .attr('onmouseout',visit => `switchLine(${visit.id},false)`);
 
   g
     .append('text')
     .style('fill', 'black')
+    .style('font-family','Verdana')
     .text(visit => visit.url);
+
+ g
+    .append('polyline')
+    .attr('points',"-5,-100 -5,10 -1,10")
+    .attr('class','arrow')
+    .attr('visit_id',visit => visit.id)
+    .attr('display','none');
+    
 };
+
+const switchLine = (visitID,display) => {
+    displayAttr = display ? 'true' : 'none'
+
+    visitParentID = dummyDataset[visitID].parent
+
+    // only show line if parent exists
+    if(visitParentID != undefined){
+        d3.select(`polyline[visit_id='${visitID}']`).attr('display',displayAttr)
+        switchLine(visitParentID,display) // switch parent's line as well
+    }
+}
 
 renderDataset(dummyDataset);
