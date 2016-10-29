@@ -204,8 +204,8 @@ const dummyDataset = {
     url: 'ku.dk',
     since: moment().add(5, 'minutes'),
     until: moment().add(15, 'minutes'),
-  }  
-  
+  }
+
 };
 
 const renderDataset = dataset => {
@@ -224,8 +224,8 @@ const renderDataset = dataset => {
     .range([0, 400])
 
   const durations = Object.values(dataset)
-    .map(visit => visit.until.diff(visit.since))
-    .sort((x, y) => x - y);
+      .map(visit => visit.until.diff(visit.since))
+.sort((x, y) => x - y);
 
   const widthScale = d3.scale.linear()
     .domain([0, durations[durations.length - 1]])
@@ -242,24 +242,24 @@ const renderDataset = dataset => {
 
 
   const g = history
-    .selectAll('.visit')
-    .data(Object.values(dataset))
-    .enter()
-    .append('g')
-    .attr('class', 'visit')
-    .attr('parent',visit => visit.parent)
-    .attr('transform', visit => `translate(${xScale(visit.since.valueOf())}, ${yScale(level(visit))})`);
+      .selectAll('.visit')
+      .data(Object.values(dataset))
+      .enter()
+      .append('g')
+      .attr('class', 'visit')
+      .attr('parent',visit => visit.parent)
+.attr('transform', visit => `translate(${xScale(visit.since.valueOf())}, ${yScale(level(visit))})`);
 
   g
     .append('line')
     .attr('x1',0)
     .attr('y1',10)
     .attr('x2', visit => widthScale(visit.until.diff(visit.since)))
-    .attr('y2',10)
+.attr('y2',10)
     .attr("stroke",visit => assignColor(visit.id))
-    .attr("stroke-width", 10)
+.attr("stroke-width", 10)
     .attr('visit_id',visit => visit.id)
-    .on('mouseover',handleMouseOver)
+.on('mouseover',handleMouseOver)
     .on('mouseout',handleMouseOut);
   // var g_button = g.append('g')
   //   .attr('class', 'button')
@@ -277,14 +277,14 @@ const renderDataset = dataset => {
     .style('font-family','Verdana')
     .text(visit => visit.url);
 
- g
+  g
     .append('polyline')
     .attr('points',"-5,-100 -5,10 -1,10")
     .attr('class','arrow')
     .attr('visit_id',visit => visit.id)
-    .attr('display','none');
+.attr('display','none');
 
-    
+
 };
 
 const assignColor = (visitID) => {
@@ -309,16 +309,17 @@ const assignColor = (visitID) => {
   return col[remainder];
 }
 
-const switchLine = (visitID,display) => {
-    displayAttr = display ? 'true' : 'none'
+const switchLine = (visitID,display,isParent) => {
+  displayAttr = display ? 'true' : 'none'
 
-    visitParentID = dummyDataset[visitID].parent
+  visitParentID = dummyDataset[visitID].parent
 
-    // only show line if parent exists
-    if(visitParentID != undefined){
-      d3.select(`polyline[visit_id='${visitID}']`).attr('display',displayAttr);
-      switchLine(visitParentID,display) // switch parent's line as well
-    }
+  // only show line if parent exists
+  if(visitParentID != undefined){
+    d3.select(`polyline[visit_id='${visitID}']`).attr('display',displayAttr);
+    switchLine(visitParentID,display, true); // switch parent's line as well
+  }
+  if (!isParent) {
     var lineHovered = d3.select(`line[visit_id='${visitID}']`);
     var attributes = {};
     if (display) {
@@ -337,6 +338,7 @@ const switchLine = (visitID,display) => {
     }
     lineHovered.transition()
       .duration(1000).attr(attributes);
+  }
 }
 
 renderDataset(dummyDataset);
