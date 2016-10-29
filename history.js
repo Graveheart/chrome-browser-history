@@ -82,6 +82,11 @@ const renderDataset = dataset => {
     .domain([0, 3])
     .range([50, 400])
 
+  const handleMouseOver = (d,i) => switchLine(d.id, true);
+
+  const handleMouseOut = (d,i) => switchLine(d.id, false);
+
+
 
   const g = history
     .selectAll('.visit')
@@ -100,8 +105,8 @@ const renderDataset = dataset => {
     .attr('y2',10)
     .attr("stroke",visit => assignColor(visit.id))
     .attr("stroke-width", 10)
-    .attr('onmouseover',visit => `switchLine(${visit.id},true)`)
-    .attr('onmouseout',visit => `switchLine(${visit.id},false)`);
+    .on('mouseover',handleMouseOver)
+    .on('mouseout',handleMouseOut);
 
   g
     .append('text')
@@ -115,6 +120,7 @@ const renderDataset = dataset => {
     .attr('class','arrow')
     .attr('visit_id',visit => visit.id)
     .attr('display','none');
+
     
 };
 
