@@ -98,7 +98,8 @@ const renderDataset = dataset => {
     .attr('y1',10)
     .attr('x2', visit => widthScale(visit.until.diff(visit.since)))
     .attr('y2',10)
-    .attr('class','sitebar')
+    .attr("stroke",visit => assignColor(visit.id))
+    .attr("stroke-width", 10)
     .attr('onmouseover',visit => `switchLine(${visit.id},true)`)
     .attr('onmouseout',visit => `switchLine(${visit.id},false)`);
 
@@ -116,6 +117,28 @@ const renderDataset = dataset => {
     .attr('display','none');
     
 };
+
+const assignColor = (visitID) => {
+  // get categorical colors
+  var c20 = d3.scale.category20(),
+    c20b = d3.scale.category20b(),
+    c20c = d3.scale.category20c(),
+    col = d3.range(60).map(function(c){
+      if (c < 20) {
+        return c20(c);
+      }
+      else if (c < 40) {
+        return c20b(c);
+      }
+      else {
+        return c20c(c);
+      }
+      return c20(c), c20b(c), c20c(c)
+    });
+  // every sixtieth url has the same color
+  var remainder = visitID % 60;
+  return col[remainder];
+}
 
 const switchLine = (visitID,display) => {
     displayAttr = display ? 'true' : 'none'
