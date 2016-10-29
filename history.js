@@ -1,17 +1,13 @@
-
 function button() {
 
   var width = 960,
     height = 500,
     radius = 10,
     padding = 10,
-    count = 0,
     container = null,
     text = null;
 
   var defs = null,
-    gradient = null,
-    shadow = null,
     cb = null,
     rect = null;
 
@@ -29,98 +25,16 @@ function button() {
     rect = g.append('rect')
       .attr("x", bbox.x - padding)
       .attr("y", bbox.y - padding)
-      .attr("width", bbox.width + 2 * padding)
-      .attr("height", bbox.height + 2 * padding)
+      .attr("width", 60)
+      .attr("height", 30)
+      .attr("fill", "#00799d")
       .attr('rx', radius)
-      .attr('ry', radius)
-
-    addGradient(count);
-    addShadow(count);
-
-    rect.attr('fill', function () { return gradient ? 'url(#gradient' + count + ')' : 'steelblue'; })
-      .attr('filter', function() { return shadow ? 'url(#dropShadow' + count + ')' : null; })
-      .on('mouseover', brighten)
-      .on('mouseout', darken)
-      .on('mousedown', press)
-      .on('mouseup', letGo)
+      .attr('ry', radius);
 
     // put text on top
     g.append(function() { return text.remove().node(); })
 
-    // TESTING -- SVG "use" element for testing dimensions of drop-shadow filter
-//    g.append('use').attr('xlink:href', '#shadowrect' + count)
-
     return my;
-  }
-
-  function addGradient(k) {
-    gradient = defs.append('linearGradient')
-      .attr('id', 'gradient' + k)
-      .attr('x1', '0%')
-      .attr('y1', '0%')
-      .attr('x2', '0%')
-      .attr('y2', '100%');
-
-    gradient.append('stop')
-      .attr('id', 'gradient-start')
-      .attr('offset', '0%')
-
-    gradient.append('stop')
-      .attr('id', 'gradient-stop')
-      .attr('offset', '100%')
-  }
-
-  function addShadow(k) {
-    shadow = defs.append('filter')
-      .attr('id', 'dropShadow' + k)
-      .attr('x', rect.attr('x'))
-      .attr('y', rect.attr('y'))
-      .attr('width', rect.attr('width'))
-      .attr('height', rect.attr('height'))
-
-    // TESTING size of drop-shadow filter
-    defs.append('rect')
-      .attr('id', 'shadowrect' + k)
-      .attr('x', rect.attr('x'))
-      .attr('y', rect.attr('y'))
-      .attr('width', rect.attr('width'))
-      .attr('height', rect.attr('height'))
-
-    shadow.append('feGaussianBlur')
-      .attr('in', 'SourceAlpha')
-      .attr('stdDeviation', '3')
-
-    shadow.append('feOffset')
-      .attr('dx', '2')
-      .attr('dy', '4')
-
-    var merge = shadow.append('feMerge')
-
-    merge.append('feMergeNode')
-    merge.append('feMergeNode').attr('in', 'SourceGraphic');
-  }
-
-  function brighten() {
-    gradient.select('#gradient-start').classed('active', true)
-    gradient.select('#gradient-stop').classed('active', true)
-  }
-
-  function darken() {
-    gradient.select('#gradient-start').classed('active', false);
-    gradient.select('#gradient-stop').classed('active', false);
-  }
-
-  function press() {
-    if (typeof cb === 'function') cb();
-    if (shadow) shadow.select('feOffset')
-      .attr('dx', '0.5')
-      .attr('dy', '1')
-  }
-
-  function letGo() {
-    if (shadow) shadow.select('feOffset')
-      .attr('dx', '2')
-      .attr('dy', '4')
   }
 
   my.container = function(_) {
@@ -135,12 +49,6 @@ function button() {
     return my;
   };
 
-  my.count = function(_) {
-    if (!arguments.length) return count;
-    count = _;
-    return my;
-  };
-
   my.cb = function(_) {
     if (!arguments.length) return cb;
     cb = _;
@@ -149,7 +57,6 @@ function button() {
 
   return my;
 }
-
 
 const dummyDataset = {
   '1': {
@@ -208,6 +115,8 @@ const dummyDataset = {
 
 };
 
+var previousLineAttributes = {};
+
 const renderDataset = dataset => {
   // Compute on which level (0...n) is this visit
   const level = visit => visit.parent ? level(dataset[visit.parent]) + 1 : 0;
@@ -239,8 +148,6 @@ const renderDataset = dataset => {
 
   const handleMouseOut = (d,i) => switchLine(d.id, false);
 
-
-
   const g = history
       .selectAll('.visit')
       .data(Object.values(dataset))
@@ -248,29 +155,30 @@ const renderDataset = dataset => {
       .append('g')
       .attr('class', 'visit')
       .attr('parent',visit => visit.parent)
-.attr('transform', visit => `translate(${xScale(visit.since.valueOf())}, ${yScale(level(visit))})`);
+      .attr('transform', visit => `translate(${xScale(visit.since.valueOf())}, ${yScale(level(visit))})`);
 
-  g
+  const line = g
     .append('line')
     .attr('x1',0)
     .attr('y1',10)
     .attr('x2', visit => widthScale(visit.until.diff(visit.since)))
-.attr('y2',10)
+    .attr('y2',10)
     .attr("stroke",visit => assignColor(visit.id))
-.attr("stroke-width", 10)
+    .attr("stroke-width", 10)
     .attr('visit_id',visit => visit.id)
-.on('mouseover',handleMouseOver)
+    .on('mouseover',handleMouseOver)
     .on('mouseout',handleMouseOut);
-  // var g_button = g.append('g')
-  //   .attr('class', 'button')
-  //   .attr('transform', 'translate(' + [480 / 2, 240 / 2] +')')
-  // var text = g_button.append('text')
-  //   .text('Click me');
-  // button()
-  //   .container(g_button)
-  //   .text(text)
-  //   .count(0)
-  //   .cb(function() { console.log("I've been clicked!") })();
+  const g_button = g.append('g')
+    .attr('class', 'button')
+    .attr('visit_id',visit => visit.id)
+    .attr('transform', visit => setButtonPosition(visit.id))
+    .attr('display','none');
+  const text = g_button.append('text')
+    .text('Details');
+  button()
+    .container(g_button)
+    .text(text)
+    .cb(function() { console.log("I've been clicked!") })();
   g
     .append('text')
     .style('fill', 'black')
@@ -282,7 +190,7 @@ const renderDataset = dataset => {
     .attr('points',"-5,-100 -5,10 -1,10")
     .attr('class','arrow')
     .attr('visit_id',visit => visit.id)
-.attr('display','none');
+    .attr('display','none');
 
 
 };
@@ -309,6 +217,18 @@ const assignColor = (visitID) => {
   return col[remainder];
 }
 
+const setButtonPosition = (visitID) => {
+  // get categorical colors
+  const line = d3.select(`line[visit_id='${visitID}']`);
+  const x2 = parseInt(line.attr('x2'));
+  var translateX = x2 - 35;
+  if (x2 < 60) {
+    translateX += 70 - x2;
+  }
+  const translateY = parseInt(line.attr('x1')) + 40;
+  return `translate(${translateX}, ${translateY})`;
+}
+
 const switchLine = (visitID,display,isParent) => {
   displayAttr = display ? 'true' : 'none'
 
@@ -321,13 +241,21 @@ const switchLine = (visitID,display,isParent) => {
   }
   if (!isParent) {
     var lineHovered = d3.select(`line[visit_id='${visitID}']`);
+
     var attributes = {};
     if (display) {
+      var x2 = lineHovered.attr('x2');
       attributes = {
         "stroke-width": 50,
         "y1": 30,
         "y2": 30
       };
+      if (x2 < 70) {
+        if (!previousLineAttributes[visitID]) {
+          previousLineAttributes[visitID] = x2;
+        }
+        attributes["x2"] = 70;
+      }
     }
     else {
       attributes = {
@@ -335,7 +263,13 @@ const switchLine = (visitID,display,isParent) => {
         "y1": 10,
         "y2": 10
       };
+      if (previousLineAttributes[visitID]) {
+        attributes["x2"] = previousLineAttributes[visitID];
+      }
     }
+    const detailsButton = d3.select(`g.button[visit_id='${visitID}']`);
+    console.warn(detailsButton);
+    detailsButton.attr('display',displayAttr);
     lineHovered.transition()
       .duration(1000).attr(attributes);
   }
