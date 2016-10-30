@@ -62,8 +62,8 @@ const dummyDataset = {
   '1': {
     id: '1',
     url: 'facebook.com',
-    since: moment().subtract(1, 'hour'),
-    until: moment().subtract(35, 'minutes'),
+    since: moment().subtract(1, 'day'),
+    until: moment().subtract(1, 'day').add(3, 'hours'),
   },
   '2': {
     id: '2',
@@ -118,6 +118,14 @@ const dummyDataset = {
 var previousLineAttributes = {};
 
 const renderDataset = dataset => {
+  // Remove previous svg
+  d3.select('body').selectAll('svg').remove();
+
+  if (Object.keys(dataset).length === 0) {
+    console.warn('Skipping, no data');
+    return;
+  }
+
   // Compute on which level (0...n) is this visit
   const level = visit => visit.parent ? level(dataset[visit.parent]) + 1 : 0;
 
@@ -335,5 +343,47 @@ const readHistoryDataset = () => {
   return dataset;
 };
 
-renderDataset(dummyDataset);
-// renderDataset(readHistoryDataset());
+let since = moment().startOf('day');
+let until = moment().endOf('day');
+
+const filter = dataset => {
+  const keys = Object.keys(dataset);
+  const goodKeys = keys.filter(key => since.isBefore(dataset[key].since) && dataset[key].until.isBefore(until));
+
+  const goodVisits = { };
+
+  goodKeys.forEach(key => {
+    if (dataset[key].parent && !goodKeys.includes(dataset[key].parent)) {
+      return;
+    }
+
+    goodVisits[key] = dataset[key]
+  });
+
+  return goodVisits;
+}
+
+const date = document.getElementById('date');
+
+const dataset = dummyDataset;
+// const dataset = readHistoryDataset();
+
+// Initial render
+date.innerText = since.format('YYYY-MM-DD');
+renderDataset(filter(dataset));
+
+const previousDay = () => {
+  since.subtract(1, 'day');
+  until.subtract(1, 'day');
+
+  date.innerText = since.format('YYYY-MM-DD');
+  renderDataset(filter(dataset));
+};
+
+const nextDay = () => {
+  since.add(1, 'day');
+  until.add(1, 'day');
+
+  date.innerText = since.format('YYYY-MM-DD');
+  renderDataset(filter(dataset));
+};
