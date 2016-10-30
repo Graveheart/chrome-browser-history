@@ -14,12 +14,7 @@ function button() {
   function my() {
 
     // set defaults
-    g = container || d3.select('svg').append('g')
-        .attr('class', 'button')
-        .attr('transform', 'translate(' + [width / 2, height / 2] + ")");
-    text = text || g.append('text').text('Hello, world!');
-
-    defs = g.append('defs');
+    g = container;
 
     var bbox = text.node().getBBox();
     rect = g.append('rect')
@@ -32,7 +27,9 @@ function button() {
       .attr('ry', radius);
 
     // put text on top
-    g.append(function() { return text.remove().node(); })
+    g.each(function() {
+      d3.select(this).append('text').text('Details');
+    });
 
     return my;
   }
@@ -174,11 +171,11 @@ const renderDataset = dataset => {
       .attr('parent',visit => visit.parent)
       .attr('transform', visit => `translate(${xScale(visit.since.valueOf())}, ${yScale(level(visit))})`);
 
-  var myTool = d3.select("body")
-    .append("div")
-    .attr("class", "mytooltip")
-    .style("opacity", "0")
-    .style("display", "none");
+  // var myTool = d3.select("body")
+  //   .append("div")
+  //   .attr("class", "mytooltip")
+  //   .style("opacity", "0")
+  //   .style("display", "none");
 
   const line = g
     .append('line')
@@ -191,13 +188,6 @@ const renderDataset = dataset => {
     .attr('visit_id',visit => visit.id)
     .on('mouseover',handleMouseOver)
     .on('mouseout',handleMouseOut);
-
-  g.append("div")
-    .style("width", 50)
-    .text(function(d) { return d; })
-    .on("mouseover", function(d){console.warn(d);tooltip.text(d); return tooltip.style("visibility", "visible");})
-    .on("mousemove", function(){console.warn(111111);return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");})
-    .on("mouseout", function(){return tooltip.style("visibility", "true");});
 
   d3.selection.prototype.last = function() {
     var last = this.size() - 1;
@@ -227,6 +217,7 @@ const renderDataset = dataset => {
     .attr('display','none');
   const text = g_button.append('text')
     .text('Details');
+
   button()
     .container(g_button)
     .text(text)
@@ -282,7 +273,7 @@ const setButtonPosition = (visitID) => {
   if (x2 < 60) {
     translateX += 70 - x2;
   }
-  const translateY = parseInt(line.attr('x1')) + 40;
+  const translateY = parseInt(line.attr('x1')) + 37;
   return `translate(${translateX}, ${translateY})`;
 }
 
