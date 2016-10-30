@@ -177,6 +177,10 @@ const renderDataset = dataset => {
   //   .style("opacity", "0")
   //   .style("display", "none");
 
+  g.
+    .on('mouseover',handleMouseOver)
+    .on('mouseout',handleMouseOut);
+
   const line = g
     .append('line')
     .attr('x1',0)
@@ -185,9 +189,7 @@ const renderDataset = dataset => {
     .attr('y2',10)
     .attr("stroke",visit => assignColor(visit.id))
     .attr("stroke-width", 10)
-    .attr('visit_id',visit => visit.id)
-    .on('mouseover',handleMouseOver)
-    .on('mouseout',handleMouseOut);
+    .attr('visit_id',visit => visit.id);
 
   d3.selection.prototype.last = function() {
     var last = this.size() - 1;
