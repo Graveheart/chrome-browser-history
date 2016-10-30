@@ -152,7 +152,7 @@ const renderDataset = dataset => {
 
   const widthScale = d3.scale.linear()
     .domain([0, durations[durations.length - 1]])
-    .range([0, 200])
+    .range([0, window.innerWidth / 3.5])
 
   const yScale = d3.scale.linear()
     .domain([0, maxLevel])
