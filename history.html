@@ -5,8 +5,11 @@
     <style>
       body {min-width: 250px;}
     </style>
+    <link href="dependencies/stylesheets/tipsy.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="dependencies/javascripts/jquery.min.js"></script>
     <script src="dependencies/d3.js"></script>
     <script src="dependencies/moment.js"></script>
+    <script src="dependencies/javascripts/jquery.tipsy.js"></script>
 
     <style media="screen">
       .visit {
@@ -56,9 +59,9 @@
   </head>
 
   <body>
-      <button type="button" onclick="previousDay()">Previous</button>
+      <button type="button" id="prevDay">Previous</button>
       <span id="date"></span>
-      <button type="button" onclick="nextDay()">Next</button>
+      <button type="button" id="nextDay">Next</button>
       <div id="timeline"></div>
       <script src="timeline.js"></script>
       <script src="history.js"></script>

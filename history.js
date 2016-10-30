@@ -174,6 +174,12 @@ const renderDataset = dataset => {
       .attr('parent',visit => visit.parent)
       .attr('transform', visit => `translate(${xScale(visit.since.valueOf())}, ${yScale(level(visit))})`);
 
+  var myTool = d3.select("body")
+    .append("div")
+    .attr("class", "mytooltip")
+    .style("opacity", "0")
+    .style("display", "none");
+
   const line = g
     .append('line')
     .attr('x1',0)
@@ -185,6 +191,13 @@ const renderDataset = dataset => {
     .attr('visit_id',visit => visit.id)
     .on('mouseover',handleMouseOver)
     .on('mouseout',handleMouseOut);
+
+  g.append("div")
+    .style("width", 50)
+    .text(function(d) { return d; })
+    .on("mouseover", function(d){console.warn(d);tooltip.text(d); return tooltip.style("visibility", "visible");})
+    .on("mousemove", function(){console.warn(111111);return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");})
+    .on("mouseout", function(){return tooltip.style("visibility", "true");});
 
   d3.selection.prototype.last = function() {
     var last = this.size() - 1;
@@ -278,6 +291,12 @@ const switchLine = (dataset, visitID,display,isParent) => {
 
   visitParentID = dataset[visitID].parent
 
+  console.warn(dataset[visitID]);
+  var tooltip = d3.select(".tooltip");
+  console.warn(tooltip);
+  tooltip.text(dataset[visitID].url);
+  tooltip.style("visibility", "visible");
+
   // only show line if parent exists
   if(visitParentID != undefined){
     d3.select(`polyline[visit_id='${visitID}']`).attr('display',displayAttr);
@@ -364,26 +383,49 @@ const filter = dataset => {
 }
 
 const date = document.getElementById('date');
+const calendarOptions = {
+  sameDay: '[Today]',
+  nextWeek: 'dddd',
+  lastDay: '[Yesterday]',
+  lastWeek: '[Last] dddd',
+  sameElse: 'DD/MM/YYYY'
+};
 
 const dataset = dummyDataset;
+
 // const dataset = readHistoryDataset();
 
 // Initial render
-date.innerText = since.format('YYYY-MM-DD');
+date.innerText = since.calendar(null, calendarOptions);
 renderDataset(filter(dataset));
 
 const previousDay = () => {
-  since.subtract(1, 'day');
+  since = since.subtract(1, 'day');
+  console.warn(since);
   until.subtract(1, 'day');
 
-  date.innerText = since.format('YYYY-MM-DD');
+  date.innerText = since.calendar(null, calendarOptions);
   renderDataset(filter(dataset));
+  nextDayDisabled();
 };
 
 const nextDay = () => {
   since.add(1, 'day');
   until.add(1, 'day');
-
-  date.innerText = since.format('YYYY-MM-DD');
+  date.innerText = since.calendar(null, calendarOptions);
   renderDataset(filter(dataset));
+  nextDayDisabled();
 };
+
+const nextDayDisabled = () => {
+  if (moment().diff(since, 'days') == 0) {
+    document.getElementById("nextDay").disabled = true;
+  }
+  else {
+    document.getElementById("nextDay").disabled = false;
+  }
+};
+
+document.getElementById("prevDay").addEventListener("click", previousDay);
+document.getElementById("nextDay").addEventListener("click", nextDay);
+document.getElementById("nextDay").disabled = true;

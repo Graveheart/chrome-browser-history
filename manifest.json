@@ -7,7 +7,6 @@
     "scripts": ["config.js", "sites.js", "tracker.js", "background.js"],
     "persistent": false
   },
-  "content_security_policy": "script-src 'self' https://ssl.google-analytics.com; object-src 'self'",
   "permissions": [
     "alarms",
     "idle",
