@@ -125,8 +125,8 @@ const renderDataset = dataset => {
   const history = d3
     .select('body')
     .append('svg')
-    .attr('width', '1000px')
-    .attr('height', '1000px');
+    .attr('width', window.innerWidth)
+    .attr('height', window.innerWidth);
 
   const sortedBySince = Object.values(dataset).slice(0).sort((x, y) => x.since.valueOf() - y.since.valueOf());
   const sortedByUntil = Object.values(dataset).slice(0).sort((x, y) => x.until.valueOf() - y.until.valueOf());
@@ -136,7 +136,7 @@ const renderDataset = dataset => {
 
   const xScale = d3.scale.linear()
     .domain([sortedBySince[0].since.valueOf(), sortedByUntil[sortedByUntil.length - 1].until.valueOf()])
-    .range([0, 400])
+    .range([0, window.innerWidth])
 
   const durations = Object.values(dataset)
     .map(visit => visit.until.diff(visit.since))
