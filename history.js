@@ -62,7 +62,7 @@ const dummyDataset = {
   '1': {
     id: '1',
     url: 'facebook.com',
-    since: moment().subtract(1, 'hour'),
+    since: moment().subtract(3, 'hour'),
     until: moment().subtract(35, 'minutes'),
   },
   '2': {
@@ -139,8 +139,8 @@ const renderDataset = dataset => {
     .range([0, 400])
 
   const durations = Object.values(dataset)
-      .map(visit => visit.until.diff(visit.since))
-.sort((x, y) => x - y);
+    .map(visit => visit.until.diff(visit.since))
+    .sort((x, y) => x - y);
 
   const widthScale = d3.scale.linear()
     .domain([0, durations[durations.length - 1]])
@@ -177,6 +177,28 @@ const renderDataset = dataset => {
     .attr('visit_id',visit => visit.id)
     .on('mouseover',handleMouseOver)
     .on('mouseout',handleMouseOut);
+
+  d3.selection.prototype.last = function() {
+    var last = this.size() - 1;
+    return d3.select(this[0][last]);
+  };
+
+  var lastLine = d3.selectAll('line').last(); //get last line width
+  var lineWidth = parseFloat(lastLine.attr('x2'));
+  var parent = lastLine.select(function() { return this.parentNode; });
+  var transform = d3.transform(parent.attr('transform'));
+  var xTransform = transform.translate[0];
+  var width = parseInt(lineWidth + xTransform);
+
+  function timelineRect() {
+    var chart = d3.timeline();
+
+    var svg = d3.select("#timeline").append("svg").attr("width", width)
+      .datum(Object.values(dataset)).call(chart);
+  }
+
+  timelineRect();
+
   const g_button = g.append('g')
     .attr('class', 'button')
     .attr('visit_id',visit => visit.id)
