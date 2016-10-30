@@ -55,6 +55,25 @@
         -ms-user-select: none;
       }
 
+      .canvas {
+        position: absolute;
+      }
+      .popup {
+        position: absolute;
+        left: 0;
+        top: 0;
+        background-color: #fff;
+        width: 300px;
+        border: 1px #ccc solid;
+        border-radius: 6px;
+        box-shadow: #333 2px 2px 4px;
+        padding: 8px;
+        font-family: arial, helvetica, sans-serif;
+      }
+      .popup h2 {
+        margin: 0 0 1rem 0;
+      }
+
     </style>
   </head>
 
@@ -62,7 +81,11 @@
       <button type="button" id="prevDay">Previous</button>
       <span id="date"></span>
       <button type="button" id="nextDay">Next</button>
-      <div id="timeline"></div>
+
+      <div id="canvas">
+        <div id="timeline"></div>
+      </div>
+
       <script src="timeline.js"></script>
       <script src="history.js"></script>
   </body>

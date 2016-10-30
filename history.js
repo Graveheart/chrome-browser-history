@@ -59,12 +59,14 @@ const dummyDataset = {
   '1': {
     id: '1',
     url: 'facebook.com',
+    visitedUrls: ['https://www.facebook.com/?sk=nf', 'https://www.facebook.com/messages/'],
     since: moment().subtract(1, 'day'),
     until: moment().subtract(1, 'day').add(3, 'hours'),
   },
   '2': {
     id: '2',
     url: 'youtube.com',
+    visitedUrls: ['https://www.youtube.com/feed/trending', 'https://www.youtube.com/feed/history', 'https://www.youtube.com/feed/subscriptions'],
     since: moment().subtract(20, 'minutes'),
     until: moment().subtract(5, 'minutes'),
   },
@@ -113,10 +115,11 @@ const dummyDataset = {
 };
 
 var previousLineAttributes = {};
+var contextMenuShowing = false;
 
 const renderDataset = dataset => {
   // Remove previous svg
-  d3.select('body').selectAll('svg').remove();
+  d3.select('#canvas').selectAll('svg').remove();
 
   if (Object.keys(dataset).length === 0) {
     console.warn('Skipping, no data');
@@ -128,7 +131,7 @@ const renderDataset = dataset => {
 
   // Create the svg
   const history = d3
-    .select('body')
+    .select('#canvas')
     .append('svg')
     .attr('width', window.innerWidth)
     .attr('height', window.innerWidth);
@@ -171,14 +174,7 @@ const renderDataset = dataset => {
       .attr('parent',visit => visit.parent)
       .attr('transform', visit => `translate(${xScale(visit.since.valueOf())}, ${yScale(level(visit))})`);
 
-  // var myTool = d3.select("body")
-  //   .append("div")
-  //   .attr("class", "mytooltip")
-  //   .style("opacity", "0")
-  //   .style("display", "none");
-
-  g.
-    .on('mouseover',handleMouseOver)
+  g.on('mouseover',handleMouseOver)
     .on('mouseout',handleMouseOut);
 
   const line = g
@@ -215,6 +211,7 @@ const renderDataset = dataset => {
   const g_button = g.append('g')
     .attr('class', 'button')
     .attr('visit_id',visit => visit.id)
+    .attr('visited_urls', visit => visit.visitedUrls)
     .attr('transform', visit => setButtonPosition(visit.id))
     .attr('display','none');
   const text = g_button.append('text')
@@ -321,10 +318,12 @@ const switchLine = (dataset, visitID,display,isParent) => {
         attributes["x2"] = previousLineAttributes[visitID];
       }
     }
-    const detailsButton = d3.select(`g.button[visit_id='${visitID}']`);
-    detailsButton.attr('display',displayAttr);
     lineHovered.transition()
       .duration(1000).attr(attributes);
+    setTimeout(function(){
+      const detailsButton = d3.select(`g.button[visit_id='${visitID}']`);
+      detailsButton.attr('display',displayAttr);
+    },500);
   }
 }
 
@@ -418,3 +417,56 @@ const nextDayDisabled = () => {
 document.getElementById("prevDay").addEventListener("click", previousDay);
 document.getElementById("nextDay").addEventListener("click", nextDay);
 document.getElementById("nextDay").disabled = true;
+
+var hideContextMenu = () => {
+  d3.select(".popup").remove();
+  contextMenuShowing = false;
+}
+
+var detailButtons = d3.selectAll(".button");
+detailButtons.on("click", function() {
+  console.log(this);
+  var targetElement = event.target || event.srcElement;
+  var selectedElement = d3.select(this);
+
+  if(contextMenuShowing) {
+    hideContextMenu();
+  } else {
+    d3_target = selectedElement;
+    var visitedUrls = d3_target.attr("visited_urls") ? d3_target.attr("visited_urls").split(',') : [];
+    contextMenuShowing = true;
+    // Build the popup
+
+    canvas = d3.select("#canvas");
+    mousePosition = d3.mouse(canvas.node());
+    popup = canvas.append("div")
+      .attr("class", "popup")
+      .style("left", mousePosition[0] + "px")
+      .style("top", mousePosition[1] + "px");
+    popup.append("h2").text("Visited Urls");
+
+    visitedUrls.forEach(url => {
+      popup.append("p")
+      .append("a")
+      .attr("href", url)
+      .text(url);
+    });
+
+    canvasSize = [
+      canvas.node().offsetWidth,
+      canvas.node().offsetHeight
+    ];
+    popupSize = [
+      popup.node().offsetWidth,
+      popup.node().offsetHeight
+    ];
+    if (popupSize[0] + mousePosition[0] > canvasSize[0]) {
+      popup.style("left", "auto");
+      popup.style("right", 0);
+    }
+    if (popupSize[1] + mousePosition[1] > canvasSize[1]) {
+      popup.style("top", "auto");
+      popup.style("bottom", 0);
+    }
+  }
+});
