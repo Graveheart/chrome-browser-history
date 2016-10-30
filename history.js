@@ -128,8 +128,14 @@ const renderDataset = dataset => {
     .attr('width', '1000px')
     .attr('height', '1000px');
 
+  const sortedBySince = Object.values(dataset).slice(0).sort((x, y) => x.since.valueOf() - y.since.valueOf());
+  const sortedByUntil = Object.values(dataset).slice(0).sort((x, y) => x.until.valueOf() - y.until.valueOf());
+  const levels = Object.values(dataset).map(visit => level(visit));
+  const maxLevel = levels.reduce((total, x) => Math.max(total, x), 0);
+  console.log(levels, maxLevel);
+
   const xScale = d3.scale.linear()
-    .domain([dummyDataset['1'].since.valueOf(), dummyDataset['3'].until.valueOf()])
+    .domain([sortedBySince[0].since.valueOf(), sortedByUntil[sortedByUntil.length - 1].until.valueOf()])
     .range([0, 400])
 
   const durations = Object.values(dataset)
@@ -141,12 +147,15 @@ const renderDataset = dataset => {
     .range([0, 200])
 
   const yScale = d3.scale.linear()
-    .domain([0, 3])
+    .domain([0, maxLevel])
     .range([50, 400])
 
-  const handleMouseOver = (d,i) => switchLine(d.id, true);
+    console.log(Object.values(dataset).map(d => widthScale(d.until.diff(d.since))));
+    // console.log(Object.values(dataset).map(visit => xScale(visit.since.valueOf())));
 
-  const handleMouseOut = (d,i) => switchLine(d.id, false);
+  const handleMouseOver = (d,i) => switchLine(dataset, d.id, true);
+
+  const handleMouseOut = (d,i) => switchLine(dataset, d.id, false);
 
   const g = history
       .selectAll('.visit')
@@ -195,6 +204,7 @@ const renderDataset = dataset => {
 
 };
 
+const colorsCache = { };
 const assignColor = (visitID) => {
   // get categorical colors
   var c20 = d3.scale.category20(),
@@ -214,6 +224,10 @@ const assignColor = (visitID) => {
     });
   // every sixtieth url has the same color
   var remainder = visitID % 60;
+  if (!colorsCache[visitID]) {
+    colorsCache[visitID] = col[Object.keys(colorsCache).length % 60];
+  }
+  return colorsCache[visitID];
   return col[remainder];
 }
 
@@ -229,15 +243,15 @@ const setButtonPosition = (visitID) => {
   return `translate(${translateX}, ${translateY})`;
 }
 
-const switchLine = (visitID,display,isParent) => {
+const switchLine = (dataset, visitID,display,isParent) => {
   displayAttr = display ? 'true' : 'none'
 
-  visitParentID = dummyDataset[visitID].parent
+  visitParentID = dataset[visitID].parent
 
   // only show line if parent exists
   if(visitParentID != undefined){
     d3.select(`polyline[visit_id='${visitID}']`).attr('display',displayAttr);
-    switchLine(visitParentID,display, true); // switch parent's line as well
+    switchLine(dataset, visitParentID,display, true); // switch parent's line as well
   }
   if (!isParent) {
     var lineHovered = d3.select(`line[visit_id='${visitID}']`);
@@ -275,4 +289,29 @@ const switchLine = (visitID,display,isParent) => {
   }
 }
 
+const readHistoryDataset = () => {
+  const history = JSON.parse(localStorage.getItem('sites'));
+
+  const dataset = { };
+
+  Object.keys(history).forEach(key => {
+    Object.keys(history[key]).forEach(site => {
+      const info = history[key][site];
+
+      dataset[site] = {
+        id: site,
+        since: moment(info.startTime),
+        until: moment(info.endTime),
+        url: info.url,
+        parent: site !== info.parentUrl ? info.parentUrl : null,
+      };
+    });
+  });
+
+  console.log(dataset);
+
+  return dataset;
+};
+
 renderDataset(dummyDataset);
+// renderDataset(readHistoryDataset());
