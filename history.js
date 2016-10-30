@@ -62,7 +62,7 @@ const dummyDataset = {
   '1': {
     id: '1',
     url: 'facebook.com',
-    since: moment().subtract(3, 'hour'),
+    since: moment().subtract(1, 'hour'),
     until: moment().subtract(35, 'minutes'),
   },
   '2': {
