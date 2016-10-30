@@ -1,15 +1,15 @@
 (function () {
   d3.timeline = function() {
     var width = null,
-      tickFormat = { format: d3.time.format("%I %p"),
-        tickTime: d3.time.hours,
-        tickInterval: 0.5,
-        tickSize: 1,
-        tickValues: null
-      },
-      beginning = 0,
-      ending = 0,
-      margin = {left: 5, right:0, top: 30, bottom:30};
+    tickFormat = {
+      format: function(d) { return d3.time.format("%H:%M")(d) },
+      tickTime: d3.time.minutes,
+      tickInterval: 30,
+      tickSize: 15
+    },
+    beginning = 0,
+    ending = 0,
+    margin = {left: 5, right:0, top: 30, bottom:30};
 
     var appendTimeAxis = function(g, xAxis, yPosition) {
       var axis = g.append("g")
@@ -31,6 +31,21 @@
       } catch (err) {
         console.log( err );
       }
+
+      // g.each(function (d, i) {
+      //   d.forEach(function (datum, index) {
+      //     var startTime = datum.since.valueOf();
+      //     var endTime = datum.until.valueOf();
+      //     if(index === 0){
+      //       originTime = startTime;               //Store the timestamp that will serve as origin
+      //       datum.since = 0;                        //Set the origin
+      //       datum.until = moment(endTime - originTime);     //Store the relative time (millis)
+      //     }else{
+      //       datum.since = moment(startTime - originTime);
+      //       datum.until = moment(endTime - originTime);
+      //     }
+      //   });
+      // });
 
       // check how many stacks we're gonna need
       if (ending === 0 || beginning === 0) {
@@ -60,6 +75,7 @@
       var xAxis = d3.svg.axis()
         .scale(xScale);
 
+      tickFormat.tickTime = 5;
       xAxis.ticks(tickFormat.tickTime, tickFormat.tickInterval);
 
       // var belowLastItem = (margin.top + (itemHeight + itemMargin) * maxStack);
