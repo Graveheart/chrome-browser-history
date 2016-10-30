@@ -291,9 +291,7 @@ const switchLine = (dataset, visitID,display,isParent) => {
 
   visitParentID = dataset[visitID].parent
 
-  console.warn(dataset[visitID]);
   var tooltip = d3.select(".tooltip");
-  console.warn(tooltip);
   tooltip.text(dataset[visitID].url);
   tooltip.style("visibility", "visible");
 
@@ -331,7 +329,6 @@ const switchLine = (dataset, visitID,display,isParent) => {
       }
     }
     const detailsButton = d3.select(`g.button[visit_id='${visitID}']`);
-    console.warn(detailsButton);
     detailsButton.attr('display',displayAttr);
     lineHovered.transition()
       .duration(1000).attr(attributes);
@@ -401,7 +398,6 @@ renderDataset(filter(dataset));
 
 const previousDay = () => {
   since = since.subtract(1, 'day');
-  console.warn(since);
   until.subtract(1, 'day');
 
   date.innerText = since.calendar(null, calendarOptions);
