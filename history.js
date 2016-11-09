@@ -72,14 +72,14 @@ const dummyDataset = {
   },
   '3': {
     id: '3',
-    url: 'reddit.com',
+    url: 'twitter.com',
     since: moment().subtract(10, 'minutes'),
     until: moment(),
     parent: '2',
   },
   '4': {
     id: '4',
-    url: 'twitter.com',
+    url: 'reddit.com',
     since: moment().subtract(8, 'minutes'),
     until: moment().subtract(2, 'minutes'),
     parent: '3',
