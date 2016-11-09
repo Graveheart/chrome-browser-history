@@ -7,8 +7,7 @@ function button() {
     container = null,
     text = null;
 
-  var defs = null,
-    cb = null,
+  var cb = null,
     rect = null;
 
   function my() {
@@ -61,57 +60,62 @@ const dummyDataset = {
     url: 'facebook.com',
     visitedUrls: ['https://www.facebook.com/?sk=nf', 'https://www.facebook.com/messages/'],
     since: moment().subtract(1, 'day'),
-    until: moment().subtract(1, 'day').add(3, 'hours'),
+    until: moment().subtract(1, 'day').add(3, 'hours')
   },
   '2': {
     id: '2',
-    url: 'youtube.com',
-    visitedUrls: ['https://www.youtube.com/feed/trending', 'https://www.youtube.com/feed/history', 'https://www.youtube.com/feed/subscriptions'],
-    since: moment().subtract(20, 'minutes'),
-    until: moment().subtract(5, 'minutes'),
+    url: 'twitter.com',
+    visitedUrls: ['https://twitter.com/i/notifications?lang=en', 'https://twitter.com/?lang=en', 'https://twitter.com/realdonaldtrump/status/796315640307060738?lang=en'],
+    since: moment('2016-11-10 12:50:00'),
+    until: moment('2016-11-10 13:45:00')
   },
   '3': {
     id: '3',
-    url: 'twitter.com',
-    since: moment().subtract(10, 'minutes'),
-    until: moment(),
+    url: 'youtube.com',
+    visitedUrls: ['https://www.youtube.com/feed/trending', 'https://www.youtube.com/feed/history', 'https://www.youtube.com/feed/subscriptions'],
+    since: moment('2016-11-10 13:00:00'),
+    until: moment('2016-11-10 13:10:00'),
     parent: '2',
   },
   '4': {
     id: '4',
+    visitedUrls:['https://www.reddit.com/new/', 'https://www.reddit.com/rising/'],
     url: 'reddit.com',
-    since: moment().subtract(8, 'minutes'),
-    until: moment().subtract(2, 'minutes'),
-    parent: '3',
+    since: moment('2016-11-10 13:15:00'),
+    until: moment('2016-11-10 13:50:00'),
+    parent: '2'
   },
   '5': {
     id: '5',
-    url: 'cnn.com',
-    since: moment().subtract(45, 'minutes'),
-    until: moment().subtract(40, 'minutes'),
-    parent: '1',
+    url: 'imgur.com',
+    visitedUrls:['http://imgur.com/gallery/VsjYG','http://imgur.com/gallery/6M4JA','http://imgur.com/gallery/SxpJC'],
+    since: moment('2016-11-10 13:30:00'),
+    until: moment('2016-11-10 13:44:00'),
+    parent: '4',
+  },
+  '5': {
+    id: '5',
+    url: 'imgur.com',
+    visitedUrls:['http://imgur.com/gallery/VsjYG','http://imgur.com/gallery/6M4JA','http://imgur.com/gallery/SxpJC'],
+    since: moment('2016-11-10 13:30:00'),
+    until: moment('2016-11-10 13:44:00'),
+    parent: '4',
   },
   '6': {
     id: '6',
-    url: 'ikea.dk',
-    since: moment().subtract(58, 'minutes'),
-    until: moment().subtract(55, 'minutes'),
-    parent: '1',
+    url: 'mail.google.com',
+    visitedUrls:['https://mail.google.com/mail/u/0/#inbox','https://mail.google.com/mail/u/0/#inbox/1584a471fc4f708c'],
+    since: moment('2016-11-10 13:50:00'),
+    until: moment('2016-11-10 14:30:00')
   },
   '7': {
     id: '7',
-    url: 'imgur.com',
-    visitedUrls:['http://imgur.com/gallery/VsjYG','http://imgur.com/gallery/6M4JA','http://imgur.com/gallery/SxpJC'],
-    since: moment().subtract(6, 'minutes'),
-    until: moment().subtract(2, 'minutes'),
-    parent: '4',
-  },
-  '8': {
-    id: '8',
     url: 'ku.dk',
-    since: moment().add(5, 'minutes'),
-    until: moment().add(15, 'minutes'),
-  }
+    since: moment('2016-11-10 14:00:00'),
+    until: moment('2016-11-10 14:10:00'),
+    visitedUrls:['https://intranet.ku.dk/science/dk/studerende/studiebeskeder/Sider/eftertilmelding_blok2_2016.aspx'],
+    parent: '6'
+  },
 
 };
 
@@ -193,7 +197,7 @@ const renderDataset = dataset => {
     return d3.select(this[0][last]);
   };
 
-  var lastLine = d3.selectAll('line').last(); //get last line width
+  var lastLine = d3.selectAll('line').last(); //get last line element
   var lineWidth = parseFloat(lastLine.attr('x2'));
   var parent = lastLine.select(function() { return this.parentNode; });
   var transform = d3.transform(parent.attr('transform'));
@@ -221,7 +225,7 @@ const renderDataset = dataset => {
   button()
     .container(g_button)
     .text(text)
-    .cb(function() { console.log("I've been clicked!") })();
+    .cb(function() {})();
   g
     .append('text')
     .style('fill', 'black')
@@ -230,7 +234,7 @@ const renderDataset = dataset => {
 
   g
     .append('polyline')
-    .attr('points',"-5,-100 -5,10 -1,10")
+    .attr('points',"-5,-160 -5,10 -1,10")
     .attr('class','arrow')
     .attr('visit_id',visit => visit.id)
     .attr('display','none');
@@ -426,7 +430,6 @@ var hideContextMenu = () => {
 
 var detailButtons = d3.selectAll(".button");
 detailButtons.on("click", function() {
-  console.log(this);
   var targetElement = event.target || event.srcElement;
   var selectedElement = d3.select(this);
 
@@ -451,6 +454,21 @@ detailButtons.on("click", function() {
       .append("a")
       .attr("href", url)
       .text(url);
+    });
+
+    var init = true;
+
+    canvas.on("click", function() {
+      if (init) {
+        init = false;
+      }
+      else {
+        hideContextMenu();
+      }
+    });
+
+    popup.on("click", function() {
+      d3.event.stopPropagation();
     });
 
     canvasSize = [
