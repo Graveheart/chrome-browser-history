@@ -101,6 +101,7 @@ const dummyDataset = {
   '7': {
     id: '7',
     url: 'imgur.com',
+    visitedUrls:['http://imgur.com/gallery/VsjYG','http://imgur.com/gallery/6M4JA','http://imgur.com/gallery/SxpJC'],
     since: moment().subtract(6, 'minutes'),
     until: moment().subtract(2, 'minutes'),
     parent: '4',
