@@ -72,7 +72,7 @@ const dummyDataset = {
   '3': {
     id: '3',
     url: 'youtube.com',
-    visitedUrls: ['https://www.youtube.com/feed/trending', 'https://www.youtube.com/feed/history', 'https://www.youtube.com/feed/subscriptions'],
+    visitedUrls: ['https://www.youtube.com/feed/trending', 'https://www.youtube.com/watch?v=RPg63uxYwN0', 'https://www.youtube.com/feed/history', 'https://www.youtube.com/feed/subscriptions'],
     since: moment('2016-11-10 13:00:00'),
     until: moment('2016-11-10 13:10:00'),
     parent: '2',
@@ -197,17 +197,23 @@ const renderDataset = dataset => {
     return d3.select(this[0][last]);
   };
 
-  var lastLine = d3.selectAll('line').last(); //get last line element
-  var lineWidth = parseFloat(lastLine.attr('x2'));
-  var parent = lastLine.select(function() { return this.parentNode; });
-  var transform = d3.transform(parent.attr('transform'));
-  var xTransform = transform.translate[0];
-  var width = parseInt(lineWidth + xTransform);
+  var timelineWidth = 0;
+  d3.selectAll('line').each( function(el) {
+    var line = d3.select(this);
+    var parent = line.select(function() { return this.parentNode; });
+    var transform = d3.transform(parent.attr('transform'));
+    var xTransform = transform.translate[0];
+    var elementEnd = xTransform + parseInt(line.attr('x2'));
+    if(elementEnd > timelineWidth) {
+      timelineWidth = elementEnd;
+    }
+  }); //get last line element
+  console.warn(timelineWidth);
 
   function timelineRect() {
     var chart = d3.timeline();
 
-    var svg = d3.select("#timeline").append("svg").attr("width", width)
+    var svg = d3.select("#timeline").append("svg").attr("width", timelineWidth)
       .datum(Object.values(dataset)).call(chart);
   }
 
@@ -328,7 +334,7 @@ const switchLine = (dataset, visitID,display,isParent) => {
     setTimeout(function(){
       const detailsButton = d3.select(`g.button[visit_id='${visitID}']`);
       detailsButton.attr('display',displayAttr);
-    },500);
+    },300);
   }
 }
 
@@ -453,6 +459,7 @@ detailButtons.on("click", function() {
       popup.append("p")
       .append("a")
       .attr("href", url)
+      .attr("target","_blank")
       .text(url);
     });
 

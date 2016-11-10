@@ -74,8 +74,14 @@
 
       var xAxis = d3.svg.axis()
         .scale(xScale);
+      
+      if (width > 700) {
+        tickFormat.tickTime = 10;
+      }
+      else {
+        tickFormat.tickTime = 5;
+      }
 
-      tickFormat.tickTime = 5;
       xAxis.ticks(tickFormat.tickTime, tickFormat.tickInterval);
 
       // var belowLastItem = (margin.top + (itemHeight + itemMargin) * maxStack);
