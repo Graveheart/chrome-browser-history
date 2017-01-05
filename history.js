@@ -66,53 +66,53 @@ const dummyDataset = {
     id: '2',
     url: 'twitter.com',
     visitedUrls: ['https://twitter.com/i/notifications?lang=en', 'https://twitter.com/?lang=en', 'https://twitter.com/realdonaldtrump/status/796315640307060738?lang=en'],
-    since: moment('2016-11-10 12:50:00'),
-    until: moment('2016-11-10 13:45:00')
+    since: moment('2017-01-05 12:50:00'),
+    until: moment('2017-01-05 13:45:00')
   },
   '3': {
     id: '3',
     url: 'youtube.com',
     visitedUrls: ['https://www.youtube.com/feed/trending', 'https://www.youtube.com/watch?v=RPg63uxYwN0', 'https://www.youtube.com/feed/history', 'https://www.youtube.com/feed/subscriptions'],
-    since: moment('2016-11-10 13:00:00'),
-    until: moment('2016-11-10 13:10:00'),
+    since: moment('2017-01-05 13:00:00'),
+    until: moment('2017-01-05 13:10:00'),
     parent: '2',
   },
   '4': {
     id: '4',
     visitedUrls:['https://www.reddit.com/new/', 'https://www.reddit.com/rising/'],
     url: 'reddit.com',
-    since: moment('2016-11-10 13:15:00'),
-    until: moment('2016-11-10 13:50:00'),
+    since: moment('2017-01-05 13:15:00'),
+    until: moment('2017-01-05 13:50:00'),
     parent: '2'
   },
   '5': {
     id: '5',
     url: 'imgur.com',
     visitedUrls:['http://imgur.com/gallery/VsjYG','http://imgur.com/gallery/6M4JA','http://imgur.com/gallery/SxpJC'],
-    since: moment('2016-11-10 13:30:00'),
-    until: moment('2016-11-10 13:44:00'),
+    since: moment('2017-01-05 13:30:00'),
+    until: moment('2017-01-05 13:44:00'),
     parent: '4',
   },
   '5': {
     id: '5',
     url: 'imgur.com',
     visitedUrls:['http://imgur.com/gallery/VsjYG','http://imgur.com/gallery/6M4JA','http://imgur.com/gallery/SxpJC'],
-    since: moment('2016-11-10 13:30:00'),
-    until: moment('2016-11-10 13:44:00'),
+    since: moment('2017-01-05 13:30:00'),
+    until: moment('2017-01-05 13:44:00'),
     parent: '4',
   },
   '6': {
     id: '6',
     url: 'mail.google.com',
     visitedUrls:['https://mail.google.com/mail/u/0/#inbox','https://mail.google.com/mail/u/0/#inbox/1584a471fc4f708c'],
-    since: moment('2016-11-10 13:50:00'),
-    until: moment('2016-11-10 14:30:00')
+    since: moment('2017-01-05 13:50:00'),
+    until: moment('2017-01-05 14:30:00')
   },
   '7': {
     id: '7',
     url: 'ku.dk',
-    since: moment('2016-11-10 14:00:00'),
-    until: moment('2016-11-10 14:10:00'),
+    since: moment('2017-01-05 14:00:00'),
+    until: moment('2017-01-05 14:10:00'),
     visitedUrls:['https://intranet.ku.dk/science/dk/studerende/studiebeskeder/Sider/eftertilmelding_blok2_2016.aspx'],
     parent: '6'
   },
